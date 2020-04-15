@@ -6,9 +6,20 @@ const DEFAULT_ITEM_CADASTRAR = {
     id: 1
 }
 
+const DEFAULT_ITEM_ATUALIZAR = {
+    nome: 'Lanterna Verde',
+    poder: 'Anel de energia',
+    id: 2
+}
+
 const database = require('./database')
 
 describe('Suite de manipulação de Heróis', () => {
+    before(async () => {
+        await database.cadastrar(DEFAULT_ITEM_CADASTRAR)
+        await database.cadastrar(DEFAULT_ITEM_ATUALIZAR)
+    })
+    
     it('deve ler um herói, usando arquivos', async () => {
         const expected = DEFAULT_ITEM_CADASTRAR
         // os colchetes [] são um recurso do JS chamado destructor
@@ -27,10 +38,35 @@ describe('Suite de manipulação de Heróis', () => {
 
     })
 
-    // it('deve cadastrar um herói, usando arquivos', async () => {
-    //     const expected = DEFAULT_ITEM_CADASTRAR
+    it('deve cadastrar um herói, usando arquivos', async () => {
+        const expected = DEFAULT_ITEM_CADASTRAR
+        const resultado = await database.cadastrar(DEFAULT_ITEM_CADASTRAR)        
+        const [atual] = await database.listar(DEFAULT_ITEM_CADASTRAR.id)
 
-    //     ok(null, expected)
+        deepEqual(atual, expected)
 
-    // })
+    })
+
+    it('deve remover um herói por id', async () => {
+        const expected = true;
+        const resultado = await database.remover(DEFAULT_ITEM_CADASTRAR.id)
+        deepEqual(resultado, expected)        
+    })
+
+    it.only('deve atualizar um heroi pelo id', async () => {
+        const expected = {
+            ...DEFAULT_ITEM_ATUALIZAR,
+            nome: 'Batman',
+            poder: 'Dinheiro'
+        }
+
+        const novoDado = {
+            nome: 'Batman',
+            poder: 'Dinheiro'
+        }
+        
+        await database.atualizar(DEFAULT_ITEM_ATUALIZAR.id, novoDado)
+        const [resultado] = await database.listar(DEFAULT_ITEM_ATUALIZAR.id)
+        deepEqual(resultado, expected)
+    })
 })
