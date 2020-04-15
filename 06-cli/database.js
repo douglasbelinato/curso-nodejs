@@ -88,17 +88,19 @@ class Database {
             ...atual,
             ...modificacoes
         }
-
-        dados.splice[indice, 1] // remove da lista
-
-        console.log('objetoAtualizar',objetoAtualizar)
+        
+        dados.splice(indice, 1) // remove da lista       
 
         return await this.escreverArquivo([
             ...dados,
             objetoAtualizar
         ])
+    }
 
-
+    async limpar() {
+        let dados = await this.obterDadosArquivo()
+        dados = []
+        return await this.escreverArquivo(dados)
     }
 }
 

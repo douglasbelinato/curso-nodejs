@@ -16,6 +16,7 @@ const database = require('./database')
 
 describe('Suite de manipulação de Heróis', () => {
     before(async () => {
+        await database.limpar()
         await database.cadastrar(DEFAULT_ITEM_CADASTRAR)
         await database.cadastrar(DEFAULT_ITEM_ATUALIZAR)
     })
@@ -53,7 +54,7 @@ describe('Suite de manipulação de Heróis', () => {
         deepEqual(resultado, expected)        
     })
 
-    it.only('deve atualizar um heroi pelo id', async () => {
+    it('deve atualizar um heroi pelo id', async () => {
         const expected = {
             ...DEFAULT_ITEM_ATUALIZAR,
             nome: 'Batman',
@@ -67,6 +68,14 @@ describe('Suite de manipulação de Heróis', () => {
         
         await database.atualizar(DEFAULT_ITEM_ATUALIZAR.id, novoDado)
         const [resultado] = await database.listar(DEFAULT_ITEM_ATUALIZAR.id)
+        deepEqual(resultado, expected)
+    })
+
+    it('deve limpar o cadastro de heróis', async () => {
+        const expected = []
+        await database.limpar()
+        const resultado = await database.listar()
+
         deepEqual(resultado, expected)
     })
 })
