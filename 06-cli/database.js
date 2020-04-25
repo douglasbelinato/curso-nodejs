@@ -59,9 +59,9 @@ class Database {
     }
 
     async remover(id) {
-        if (!id) {
-            return await this.escreverArquivo([])
-        }
+        // if (!id) {
+        //     return await this.escreverArquivo([])
+        // }
 
         const dados = await this.obterDadosArquivo()
         const indice = dados.findIndex(item => item.id === parseInt(id))
