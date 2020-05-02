@@ -10,4 +10,4 @@ INSERT INTO TB_HEROIS (NOME, PODER)
 VALUES (
     'Flash', 'Velocidade',
     'Mercúrio', 'Velocidade'
-)
+);
