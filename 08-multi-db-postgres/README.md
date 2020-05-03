@@ -41,11 +41,5 @@ docker run \
 
 ### MongoDB - Create application user after in MongoDB
 docker exec -it mongodb \
-    mongo --host localhost -u admin -p admin --authenticationDatabase admin \
+    mongo --host localhost -u root -p root --authenticationDatabase admin \
     --eval "db.getSiblingDB('herois').createUser({user: 'heroiapp', pwd: 'pass', roles: [{role: 'readWrite', db: 'herois'}]})"
-
-### Sequelize - ORM
-npm install sequelize
-
-### Postgres Drivers - 'pg-store' and 'pg'
-npm install pg-hstore pg

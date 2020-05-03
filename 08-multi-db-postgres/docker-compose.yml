@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 services:
   postgres:
     image: postgres
@@ -11,17 +11,20 @@ services:
     networks:
       - pgnet
   
-  mongo:
+  mongodb:
     image: mongo:latest
+    container_name: mongodb
     restart: always
     ports:
       - 27017:27017
     environment:
-      MONGO_INITDB_ROOT_USERNAME: "root"
-      MONGO_INITDB_ROOT_PASSWORD: "root"
-      MONGO_INITDB_DATABASE: "herois"
-      MONGO_NON_ROOT_USERNAME: "herois_app"
-      MONGO_NON_ROOT_PASSWORD: "pass"
+      - MONGO_INITDB_DATABASE=herois
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_NON_ROOT_USERNAME=heroiapp
+      - MONGO_NON_ROOT_PASSWORD=pass
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     networks:
       - mongonet
 
@@ -36,13 +39,15 @@ services:
 
   mongoclient:
     image: mongoclient/mongoclient
+    container_name: mongoclient
     ports: 
       - "3000:3000"
     depends_on: 
-      - mongo
+      - mongodb
     environment:
       STARTUP_DELAY: 10
-      MONGO_URL: "mongodb://root:root@mongo:27017/admin"
+      # MONGO_URL: "mongodb://root:root@mongodb:27017/admin"
+      # MONGO_URL: "mongodb://heroiapp:pass@mongodb:27017/herois"
     networks:
       - mongonet
 
