@@ -39,7 +39,7 @@ describe('Testando MongoDB Strategy', function() {
         assert.deepEqual({nome, poder}, MOCK_HEROI_CADASTRAR)
     })
 
-    it.only('Deve atualizar um herói', async() => {
+    it('Deve atualizar um herói', async() => {
         const heroiAtualizar = await context.create(MOCK_HEROI_ATUALIZAR);
         const result = await context.update(heroiAtualizar._id, {poder: 'Time is money'})
         assert.deepEqual(result.nModified, 1)
