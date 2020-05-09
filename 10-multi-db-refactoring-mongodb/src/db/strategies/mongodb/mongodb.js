@@ -1,12 +1,12 @@
-const ICrud = require('./interfaces/interfaceCrud')
+const ICrud = require('../interfaces/interfaceCrud')
 // npm install mongoose
 const Mongoose = require('mongoose')
 
 class MongoDB extends ICrud {
-    constructor() {
+    constructor(connection, schema) {
         super()
-        this._herois = null
-        this._driver = null
+        this._schema = schema
+        this._connection = connection
     }
 
     async isConnected() {
@@ -17,7 +17,7 @@ class MongoDB extends ICrud {
             3: 'Desconectando'
         }
 
-        const state = STATUS[this._driver.readyState]
+        const state = STATUS[this._connection.readyState]
         
         if (state === 'Conectado') return true;
 
@@ -27,10 +27,10 @@ class MongoDB extends ICrud {
         await new Promise(resolve => setTimeout(resolve, 1000))
         
         // Tenta verificar novamente se conectou
-        return STATUS[this._driver.readyState] === 'Conectado';
+        return STATUS[this._connection.readyState] === 'Conectado';
     }
 
-    async connect() {        
+    static connect() {
         Mongoose.connect('mongodb://heroiapp:pass@localhost:27017/herois',
             { useNewUrlParser: true, useUnifiedTopology: true }, function (error) {
                 if (!error) return;
@@ -39,46 +39,23 @@ class MongoDB extends ICrud {
 
         const connection = Mongoose.connection
         connection.once('open', () => console.log('MongoDB em execução e conexão realizada com sucesso!'))
-
-        this._driver = connection
-        await this.defineModel()
-    }
-
-    async defineModel() {
-        // Modelo da coleção
-        const heroisSchema = new Mongoose.Schema({
-            nome: {
-                type: String,
-                required: true
-            },
-            poder: {
-                type: String,
-                required: true
-            },
-            insertAt: {
-                type: Date,
-                default: new Date()
-            }
-        })
-
-        // seta a definição do modelo
-        this._herois = Mongoose.model('herois', heroisSchema)
+        return connection
     }
 
     async create(item) {
-        return await this._herois.create(item)
+        return await this._schema.create(item)
     }
 
     async read(query, skip=0, limit=10) {
-        return this._herois.find(query).skip(skip).limit(limit)
+        return this._schema.find(query).skip(skip).limit(limit)
     }
 
     async update(id, item) {
-        return this._herois.updateOne({_id: id}, { $set: item})
+        return this._schema.updateOne({_id: id}, { $set: item})
     }
 
     async delete(id) {
-        return this._herois.deleteOne({ _id: id})
+        return this._schema.deleteOne({ _id: id})
     }
 }
 

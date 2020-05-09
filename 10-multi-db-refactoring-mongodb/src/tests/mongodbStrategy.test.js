@@ -1,8 +1,9 @@
 const assert = require('assert')
-const MongoDB = require('../db/strategies/mongodb')
+const MongoDB = require('../db/strategies/mongodb/mongodb')
+const HeroiSchema = require('../db/strategies/mongodb/schemas/heroiSchema')
 const Context = require('../db/strategies/base/contextStrategy')
 
-const context = new Context(new MongoDB())
+let context = {}
 
 const MOCK_HEROI_CADASTRAR = {
     nome: 'Homem-aranha',
@@ -21,7 +22,8 @@ const MOCK_HEROI_EXCLUIR = {
 
 describe('Testando MongoDB Strategy', function() {
     this.beforeAll(async () => {
-        await context.connect()
+        const connection = MongoDB.connect()
+        context = new Context(new MongoDB(connection, HeroiSchema))
     })
 
     it('Verificar conexão', async () => {
