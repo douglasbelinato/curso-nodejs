@@ -1,8 +1,9 @@
 const assert = require('assert')
-const Postgres = require('../db/strategies/postgres')
+const Postgres = require('../db/strategies/postgres/postgres')
+const HeroiSchema = require('../db/strategies/postgres/schemas/heroiSchema')
 const Context = require('../db/strategies/base/contextStrategy')
 
-const context = new Context(new Postgres())
+let context = {}
 const MOCK_HEROI_CADASTRAR = {
     nome: 'Homem-aranha',
     poder: 'Força, agilidade e sentido aranha'
@@ -16,14 +17,15 @@ const MOCK_HEROI_DELETAR = {
     poder: 'Super força'
 }
 
-
 describe('Testando Postgres Strategy', function() {
     // Como pode haver uma certa demora para conectar no banco, definimos
     // que ele pode levar o tempo que for necessário
     this.timeout(Infinity)
 
     this.beforeAll(async () => {
-        await context.connect()
+        const connection = await Postgres.connect()
+        const model = await Postgres.defineModel(connection, HeroiSchema)
+        context = new Context(new Postgres(connection, model))
         await context.delete() // limpa a base de testes
     })
     
