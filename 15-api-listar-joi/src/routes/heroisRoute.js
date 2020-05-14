@@ -1,4 +1,5 @@
 const BaseRoute = require('./base/baseRoute')
+const Join = require('joi')
 
 class HeroisRoute extends BaseRoute {
     constructor(db) {
@@ -10,15 +11,31 @@ class HeroisRoute extends BaseRoute {
         return {
             path: '/herois',
             method: 'GET',
+            config: {
+                validate: {
+                    failAction: (request, headers, erro) => {
+                        throw erro;
+                    },
+                    query: {
+                        skip: Join.number().integer().default(0),
+                        limit: Join.number().integer().default(10),
+                        nome: Join.string().min(3).max(100)
+                    }
+                }
+            },            
             handler: (request, headers) => {
                 try {
                     let {skip, limit, nome} = request.query
 
                     let query = {}
                     if (nome) {
-                        query.nome= nome
-                    }                    
-                    
+                        query = {
+                            nome: {
+                                $regex: `.*${nome}*.`
+                            }
+                        }
+                    }
+                                        
                     if (skip === undefined) {
                         skip = 0
                     }
