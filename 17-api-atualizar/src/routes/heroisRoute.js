@@ -87,6 +87,39 @@ class HeroisRoute extends BaseRoute {
             }
         }
     }
+
+    update() {
+        return {
+            path: '/herois/{id}',
+            method: 'PATCH',
+            config: {
+                validate: {
+                    failAction,
+                    params: {
+                        id: Join.string().required()
+                    },
+                    payload: {
+                        nome: Join.string().min(3).max(100),
+                        poder: Join.string().min(2).max(50),
+                    }
+                }
+            },
+            handler: async (request) => {
+                try {
+                    const {id} = request.params
+
+                    // Técnica para remover atributos não inicializados
+                    const dadosString = JSON.stringify(request.payload)
+                    const dados = JSON.parse(dadosString)
+
+                    return await this.db.update(id, dados)
+                } catch(error) {
+                    console.error('Ocorreu um erro', error)
+                    return "Erro interno"
+                }
+            }
+        }
+    }
 }
 
 module.exports = HeroisRoute

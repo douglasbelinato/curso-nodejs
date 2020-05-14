@@ -7,6 +7,11 @@ const MOCK_HEROI_CADASTRAR = {
     poder: 'Marreta Bionica'
 }
 
+const MOCK_HEROI_ATUALIZAR = {
+    nome: 'Goku',
+    poder: 'Super Sayajin'
+}
+
 describe('Suíte de testes para a API de Heróis', function() {
     this.beforeAll(async() => {
         app = await api
@@ -77,5 +82,41 @@ describe('Suíte de testes para a API de Heróis', function() {
 
         const {nome, poder} = JSON.parse(result.payload)
         assert.deepEqual({nome, poder}, MOCK_HEROI_CADASTRAR)
+    })
+
+    it('Deve atualizar parcialmente um herói - PATCH /herois/{id}', async() => {
+        const resultCadastrar = await app.inject({
+            method: 'POST',
+            url: '/herois',
+            payload: MOCK_HEROI_ATUALIZAR
+        })
+
+        const heroiCadastrado = JSON.parse(resultCadastrar.payload)        
+
+        const resultAtualizar = await app.inject({
+            method: 'PATCH',
+            url: `/herois/${heroiCadastrado._id}`,
+            payload: {poder: 'Super Sayajin 2'}
+        })
+
+        assert.deepEqual(resultAtualizar.result.nModified, 1)
+    })
+
+    it.only('Não deve atualizar parcialmente um herói com id incorreto- PATCH /herois/{id}', async() => {
+        const resultCadastrar = await app.inject({
+            method: 'POST',
+            url: '/herois',
+            payload: MOCK_HEROI_ATUALIZAR
+        })
+
+        const heroiCadastrado = JSON.parse(resultCadastrar.payload)        
+
+        const resultAtualizar = await app.inject({
+            method: 'PATCH',
+            url: '/herois/1}',
+            payload: {poder: 'Super Sayajin 2'}
+        })
+
+        assert.deepEqual(resultAtualizar.result, 'Erro interno')
     })
 })
