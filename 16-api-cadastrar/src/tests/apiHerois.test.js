@@ -2,6 +2,11 @@ const assert = require('assert')
 const api = require('./../api')
 let app = {}
 
+const MOCK_HEROI_CADASTRAR = {
+    nome: 'Chapolin Colorado',
+    poder: 'Marreta Bionica'
+}
+
 describe('Suíte de testes para a API de Heróis', function() {
     this.beforeAll(async() => {
         app = await api
@@ -61,5 +66,16 @@ describe('Suíte de testes para a API de Heróis', function() {
         })        
         
         assert.ok(JSON.parse(result.payload).length >= 1)
+    })
+
+    it('Deve cadastrar um herói - POST /herois', async() => {
+        const result = await app.inject({
+            method: 'POST',
+            url: '/herois',
+            payload: MOCK_HEROI_CADASTRAR
+        })
+
+        const {nome, poder} = JSON.parse(result.payload)
+        assert.deepEqual({nome, poder}, MOCK_HEROI_CADASTRAR)
     })
 })
