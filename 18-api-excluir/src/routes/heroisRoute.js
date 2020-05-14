@@ -1,5 +1,6 @@
 const BaseRoute = require('./base/baseRoute')
 const Join = require('joi')
+const Boom = require('boom')
 
 const failAction = (request, headers, erro) => {
     throw erro;
@@ -46,18 +47,11 @@ class HeroisRoute extends BaseRoute {
                     if (limit === undefined) {
                         limit = 10
                     }
-                    
-                    if (isNaN(skip)) {
-                        throw Error('O parâmetro skip deve ser numérico')
-                    }
-                    if (isNaN(limit)) {
-                        throw Error('O parâmetro limit deve ser numérico')
-                    }
 
                     return this.db.read(query, parseInt(skip), parseInt(limit))
                 } catch (error) {
                     console.error('Ocorreu um erro', error)
-                    return "Erro interno"
+                    return Boom.internal()
                 }                
             }
         }
@@ -82,7 +76,7 @@ class HeroisRoute extends BaseRoute {
                     return await this.db.create({nome, poder})
                 } catch(error) {
                     console.error('Ocorreu um erro', error)
-                    return "Erro interno"
+                    return Boom.internal()
                 }
             }
         }
@@ -115,7 +109,31 @@ class HeroisRoute extends BaseRoute {
                     return await this.db.update(id, dados)
                 } catch(error) {
                     console.error('Ocorreu um erro', error)
-                    return "Erro interno"
+                    return Boom.internal()
+                }
+            }
+        }
+    }
+
+    delete() {
+        return {
+            path: '/herois/{id}',
+            method: 'DELETE',
+            config: {
+                validate: {
+                    failAction,
+                    params: {
+                        id: Join.string().required()
+                    }
+                }
+            },
+            handler: async (request) => {
+                try {
+                    const {id} = request.params
+                    return await this.db.delete(id)
+                } catch (error) {
+                    console.error('Ocorreu um erro', error)
+                    return Boom.internal()
                 }
             }
         }

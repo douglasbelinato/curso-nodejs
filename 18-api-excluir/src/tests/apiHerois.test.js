@@ -1,3 +1,4 @@
+const Mongoose = require('mongoose')
 const assert = require('assert')
 const api = require('./../api')
 let app = {}
@@ -9,6 +10,11 @@ const MOCK_HEROI_CADASTRAR = {
 
 const MOCK_HEROI_ATUALIZAR = {
     nome: 'Goku',
+    poder: 'Super Sayajin'
+}
+
+const MOCK_HEROI_EXCLUIR = {
+    nome: 'Vegeta',
     poder: 'Super Sayajin'
 }
 
@@ -103,20 +109,48 @@ describe('Suíte de testes para a API de Heróis', function() {
     })
 
     it('Não deve atualizar parcialmente um herói com id incorreto- PATCH /herois/{id}', async() => {
-        const resultCadastrar = await app.inject({
-            method: 'POST',
-            url: '/herois',
-            payload: MOCK_HEROI_ATUALIZAR
+        const resultAtualizar = await app.inject({
+            method: 'PATCH',
+            url: `/herois/${Mongoose.Types.ObjectId(3)}`,
+            payload: {poder: 'Super Sayajin 2'}
         })
 
-        const heroiCadastrado = JSON.parse(resultCadastrar.payload)        
+        assert.ok(resultAtualizar.result.nModified === 0)
+    })
 
+    it('Deve lançar erro informando id incorreto MongoDB- PATCH /herois/{id}', async() => {
         const resultAtualizar = await app.inject({
             method: 'PATCH',
             url: '/herois/1}',
             payload: {poder: 'Super Sayajin 2'}
         })
 
-        assert.deepEqual(resultAtualizar.result, 'Erro interno')
+        assert.deepEqual(resultAtualizar.statusCode, 500)
+    })
+
+    it('Deve excluir um herói com id - DELETE /herois/{id}', async() => {
+        const resultCadastrar = await app.inject({
+            method: 'POST',
+            url: '/herois',
+            payload: MOCK_HEROI_EXCLUIR
+        })
+
+        const heroiCadastrado = JSON.parse(resultCadastrar.payload)        
+
+        const resultDeletar = await app.inject({
+            method: 'DELETE',
+            url: `/herois/${heroiCadastrado._id}`
+        })
+
+        assert.deepEqual(resultDeletar.result.deletedCount, 1)
+    })
+
+    it('Não deve excluir um herói com id incorreto - DELETE /herois/{id}', async() => {
+        const resultDeletar = await app.inject({
+            method: 'DELETE',
+            url: `/herois/${Mongoose.Types.ObjectId(3)}`
+        })
+        
+        assert.ok(resultDeletar.result.deletedCount === 0)
     })
 })
