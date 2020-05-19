@@ -1,5 +1,5 @@
 // npm i hapi
-const Hapi = require('hapi')
+const Hapi = require('@hapi/hapi')
 const Context = require('./db/strategies/base/contextStrategy')
 const MongoDB = require('./db/strategies/mongodb/mongodb')
 const HeroiSchema = require('./db/strategies/mongodb/schemas/heroiSchema')

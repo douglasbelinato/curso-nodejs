@@ -1,5 +1,5 @@
 const BaseRoute = require('./base/baseRoute')
-const Join = require('joi')
+const Joi = require('@hapi/joi')
 const Boom = require('boom')
 
 const failAction = (request, headers, erro) => {
@@ -20,11 +20,11 @@ class HeroisRoute extends BaseRoute {
                 validate: {
                     // poderia ser assim tbm >>> failAction: failAction (como tem o mesmo nome dos dois lados, podemos simplificar)
                     failAction,
-                    query: {
-                        skip: Join.number().integer().default(0),
-                        limit: Join.number().integer().default(10),
-                        nome: Join.string().min(3).max(100)
-                    }
+                    query: Joi.object({
+                        skip: Joi.number().integer().default(0),
+                        limit: Joi.number().integer().default(10),
+                        nome: Joi.string().min(3).max(100)
+                    })
                 }
             },            
             handler: (request, headers) => {
@@ -64,10 +64,10 @@ class HeroisRoute extends BaseRoute {
             config: {
                 validate: {
                     failAction,
-                    payload: {
-                        nome: Join.string().required().min(3).max(100),
-                        poder: Join.string().required().min(2).max(50),
-                    }
+                    payload: Joi.object({
+                        nome: Joi.string().required().min(3).max(100),
+                        poder: Joi.string().required().min(2).max(50),
+                    })
                 }
             },
             handler: async (request) => {
@@ -89,13 +89,13 @@ class HeroisRoute extends BaseRoute {
             config: {
                 validate: {
                     failAction,
-                    params: {
-                        id: Join.string().required()
-                    },
-                    payload: {
-                        nome: Join.string().min(3).max(100),
-                        poder: Join.string().min(2).max(50),
-                    }
+                    params: Joi.object({
+                        id: Joi.string().required()
+                    }),
+                    payload: Joi.object({
+                        nome: Joi.string().min(3).max(100),
+                        poder: Joi.string().min(2).max(50),
+                    })
                 }
             },
             handler: async (request) => {
@@ -122,9 +122,9 @@ class HeroisRoute extends BaseRoute {
             config: {
                 validate: {
                     failAction,
-                    params: {
-                        id: Join.string().required()
-                    }
+                    params: Joi.object({
+                        id: Joi.string().required()
+                    })
                 }
             },
             handler: async (request) => {
