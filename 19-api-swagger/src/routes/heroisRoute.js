@@ -17,6 +17,9 @@ class HeroisRoute extends BaseRoute {
             path: '/herois',
             method: 'GET',
             config: {
+                description: 'Obtém a lista de heróis cadastrados',
+                notes: 'Lista heróis',
+                tags: ['api'],
                 validate: {
                     // poderia ser assim tbm >>> failAction: failAction (como tem o mesmo nome dos dois lados, podemos simplificar)
                     failAction,
@@ -62,6 +65,9 @@ class HeroisRoute extends BaseRoute {
             path: '/herois',
             method: 'POST',
             config: {
+                description: 'Cadastra um herói',
+                notes: 'Cadastra herói',
+                tags: ['api'],
                 validate: {
                     failAction,
                     payload: Joi.object({
@@ -87,6 +93,9 @@ class HeroisRoute extends BaseRoute {
             path: '/herois/{id}',
             method: 'PATCH',
             config: {
+                description: 'Atualiza um herói',
+                notes: 'Atualiza herói',
+                tags: ['api'],
                 validate: {
                     failAction,
                     params: Joi.object({
@@ -120,6 +129,9 @@ class HeroisRoute extends BaseRoute {
             path: '/herois/{id}',
             method: 'DELETE',
             config: {
+                description: 'Exclui um herói',
+                notes: 'Exclui herói',
+                tags: ['api'],
                 validate: {
                     failAction,
                     params: Joi.object({
