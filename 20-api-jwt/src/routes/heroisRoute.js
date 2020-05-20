@@ -6,6 +6,10 @@ const failAction = (request, headers, erro) => {
     throw erro;
 }
 
+const headers = Joi.object({
+    authorization: Joi.string().required()
+}).unknown()
+
 class HeroisRoute extends BaseRoute {
     constructor(db) {
         super()
@@ -23,11 +27,12 @@ class HeroisRoute extends BaseRoute {
                 validate: {
                     // poderia ser assim tbm >>> failAction: failAction (como tem o mesmo nome dos dois lados, podemos simplificar)
                     failAction,
+                    headers,
                     query: Joi.object({
                         skip: Joi.number().integer().default(0),
                         limit: Joi.number().integer().default(10),
                         nome: Joi.string().min(3).max(100)
-                    })
+                    })                    
                 }
             },            
             handler: (request, headers) => {
@@ -70,6 +75,7 @@ class HeroisRoute extends BaseRoute {
                 tags: ['api'],
                 validate: {
                     failAction,
+                    headers,
                     payload: Joi.object({
                         nome: Joi.string().required().min(3).max(100),
                         poder: Joi.string().required().min(2).max(50),
@@ -98,6 +104,7 @@ class HeroisRoute extends BaseRoute {
                 tags: ['api'],
                 validate: {
                     failAction,
+                    headers,
                     params: Joi.object({
                         id: Joi.string().required()
                     }),
@@ -134,6 +141,7 @@ class HeroisRoute extends BaseRoute {
                 tags: ['api'],
                 validate: {
                     failAction,
+                    headers,
                     params: Joi.object({
                         id: Joi.string().required()
                     })

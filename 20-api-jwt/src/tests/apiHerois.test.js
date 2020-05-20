@@ -1,6 +1,7 @@
 const Mongoose = require('mongoose')
 const assert = require('assert')
 const api = require('./../api')
+const Boom = require('boom')
 let app = {}
 
 const MOCK_HEROI_CADASTRAR = {
@@ -18,17 +19,32 @@ const MOCK_HEROI_EXCLUIR = {
     poder: 'Super Sayajin'
 }
 
+const headers = {
+    Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFwaS11c2VyIiwiaWQiOjEsImlhdCI6MTU4OTkyNDY1NH0.lcw5mhFqHDiR0H8XurDZMr2zdnkJZr7Fj1t8HCmDkN8'
+}
+
 describe('Suíte de testes para a API de Heróis', function() {
     this.beforeAll(async() => {
         app = await api
     })
 
-    it('Deve listar heróis - GET /herois', async() => {
+    it('Não deve listar heróis sem informar o token JWT - GET /herois', async() => {
         const result = await app.inject({
             method: 'GET',
             url: '/herois'
         })
 
+        const {statusCode} = JSON.parse(result.payload)
+        assert.deepEqual(statusCode, Boom.unauthorized().output.statusCode)
+    })
+
+    it('Deve listar heróis - GET /herois', async() => {
+        const result = await app.inject({
+            method: 'GET',
+            headers,
+            url: '/herois'
+        })
+        
         const dados = JSON.parse(result.payload)
         assert.ok(Array.isArray(dados))
     })
@@ -36,6 +52,7 @@ describe('Suíte de testes para a API de Heróis', function() {
     it('Deve paginar 1 herói - GET /herois?skip=0&limit=1', async() => {
         const result = await app.inject({
             method: 'GET',
+            headers,
             url: '/herois?skip=0&limit=1'
         })
 
@@ -46,6 +63,7 @@ describe('Suíte de testes para a API de Heróis', function() {
     it('Deve gerar erro com parâmetro limit inválido - GET /herois?skip=0&limit=teste', async() => {
         const result = await app.inject({
             method: 'GET',
+            headers,
             url: '/herois?limit=teste'
         })
 
@@ -55,6 +73,7 @@ describe('Suíte de testes para a API de Heróis', function() {
     it('Deve gerar erro com parâmetro skip inválido - GET /herois?skip=0&skip=teste', async() => {
         const result = await app.inject({
             method: 'GET',
+            headers,
             url: '/herois?skip=teste'
         })
 
@@ -64,6 +83,7 @@ describe('Suíte de testes para a API de Heróis', function() {
     it('Deve gerar erro com parâmetro nome inválido - GET /herois?nome=H', async() => {
         const result = await app.inject({
             method: 'GET',
+            headers,
             url: '/herois?nome=H'
         })
 
@@ -73,6 +93,7 @@ describe('Suíte de testes para a API de Heróis', function() {
     it('Deve buscar herói pelo nome completo - GET /herois?nome=Homem-aranha', async() => {
         const result = await app.inject({
             method: 'GET',
+            headers,
             url: '/herois?nome=Homem-aranha'
         })        
         
@@ -82,6 +103,7 @@ describe('Suíte de testes para a API de Heróis', function() {
     it('Deve cadastrar um herói - POST /herois', async() => {
         const result = await app.inject({
             method: 'POST',
+            headers,
             url: '/herois',
             payload: MOCK_HEROI_CADASTRAR
         })
@@ -93,6 +115,7 @@ describe('Suíte de testes para a API de Heróis', function() {
     it('Deve atualizar parcialmente um herói - PATCH /herois/{id}', async() => {
         const resultCadastrar = await app.inject({
             method: 'POST',
+            headers,
             url: '/herois',
             payload: MOCK_HEROI_ATUALIZAR
         })
@@ -101,6 +124,7 @@ describe('Suíte de testes para a API de Heróis', function() {
 
         const resultAtualizar = await app.inject({
             method: 'PATCH',
+            headers,
             url: `/herois/${heroiCadastrado._id}`,
             payload: {poder: 'Super Sayajin 2'}
         })
@@ -111,6 +135,7 @@ describe('Suíte de testes para a API de Heróis', function() {
     it('Não deve atualizar parcialmente um herói com id incorreto- PATCH /herois/{id}', async() => {
         const resultAtualizar = await app.inject({
             method: 'PATCH',
+            headers,
             url: `/herois/${Mongoose.Types.ObjectId(3)}`,
             payload: {poder: 'Super Sayajin 2'}
         })
@@ -121,6 +146,7 @@ describe('Suíte de testes para a API de Heróis', function() {
     it('Deve lançar erro informando id incorreto MongoDB- PATCH /herois/{id}', async() => {
         const resultAtualizar = await app.inject({
             method: 'PATCH',
+            headers,
             url: '/herois/1}',
             payload: {poder: 'Super Sayajin 2'}
         })
@@ -131,6 +157,7 @@ describe('Suíte de testes para a API de Heróis', function() {
     it('Deve excluir um herói com id - DELETE /herois/{id}', async() => {
         const resultCadastrar = await app.inject({
             method: 'POST',
+            headers,
             url: '/herois',
             payload: MOCK_HEROI_EXCLUIR
         })
@@ -139,6 +166,7 @@ describe('Suíte de testes para a API de Heróis', function() {
 
         const resultDeletar = await app.inject({
             method: 'DELETE',
+            headers,
             url: `/herois/${heroiCadastrado._id}`
         })
 
@@ -148,6 +176,7 @@ describe('Suíte de testes para a API de Heróis', function() {
     it('Não deve excluir um herói com id incorreto - DELETE /herois/{id}', async() => {
         const resultDeletar = await app.inject({
             method: 'DELETE',
+            headers,
             url: `/herois/${Mongoose.Types.ObjectId(3)}`
         })
         
