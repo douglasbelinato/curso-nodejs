@@ -8,6 +8,8 @@ services:
       POSTGRES_USER: "herois_app"
       POSTGRES_PASSWORD: "pass"
       POSTGRES_DB: "herois"
+    volumes:
+      - ./docker-entrypoint-initdb.d/init-postgres.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - pgnet
   

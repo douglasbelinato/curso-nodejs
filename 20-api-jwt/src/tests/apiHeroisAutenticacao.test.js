@@ -14,8 +14,8 @@ describe('Suíte de testes para a autenticação da API de Heróis', function() 
             method: 'POST',
             url: '/login',
             payload: {
-                username: 'api-user',
-                password: 'api-pass'
+                username: 'app-user',
+                password: 'app-pass'
             }
         })
 

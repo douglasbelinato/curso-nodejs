@@ -3,13 +3,18 @@
 // npm i jsonwebtoken
 // npm i hapi-auth-jwt2
 
+// npm install node-gyp
+// npm install bcrypt
+
 // Exemplos - Hapi JS com Swagger: 
 // https://medium.com/@saivarunk/creating-api-routes-with-swagger-documentation-for-hapi-js-36c663df936d
 // https://github.com/glennjones/hapi-swagger
 
 const Context = require('./db/strategies/base/contextStrategy')
 const MongoDB = require('./db/strategies/mongodb/mongodb')
+const Postgres = require('./db/strategies/postgres/postgres')
 const HeroiSchema = require('./db/strategies/mongodb/schemas/heroiSchema')
+const UsuarioSchema = require('./db/strategies/postgres/schemas/usuarioSchema')
 
 const Hapi = require('@hapi/hapi')
 const HeroisRoute = require('./routes/heroisRoute')
@@ -44,6 +49,10 @@ async function main() {
     const connection = MongoDB.connect()
     const context = new Context(new MongoDB(connection, HeroiSchema))
 
+    const connectionPostgres = await Postgres.connect()
+    const model = await Postgres.defineModel(connectionPostgres, UsuarioSchema)
+    const contextPostgres = new Context(new Postgres(connectionPostgres, model))
+
     // Registra no server os módulos
     await app.register([
         HapiAuthJwt2,
@@ -60,8 +69,23 @@ async function main() {
         // options: {
         //     expiresIn: 20
         // },
-        validate: (dado, request) => {
-            return {
+        validate: async (dado, request) => {
+            // Mesmo com um token válido em mãos, podemos configurar checagens adicionais.
+            // É útil, por exemplo, caso o cliente tenha um token válido mas seu acesso seja revogado 
+            // no banco de dados. Então nós criamos esse double check para impedir o consumo
+            // dos recursos da API
+            console.log('dado-->', dado)
+            const [result] = await contextPostgres.read({
+                username: dado.username.toLowerCase()
+            })
+
+            if (!result) {
+                return {
+                    isValid: false
+                }
+            }
+            
+            return {                
                 isValid: true
             }
         }
@@ -70,7 +94,7 @@ async function main() {
     app.auth.default('jwt-auth')
 
     app.route([
-        ...mapRoutes(new AuthRoute(JWT_SECRET, context), AuthRoute.methods()),
+        ...mapRoutes(new AuthRoute(JWT_SECRET, contextPostgres), AuthRoute.methods()),
         ...mapRoutes(new HeroisRoute(context), HeroisRoute.methods())
     ])
     
