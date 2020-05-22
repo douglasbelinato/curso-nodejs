@@ -20,7 +20,7 @@ const MOCK_HEROI_EXCLUIR = {
 }
 
 const headers = {
-    Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFwaS11c2VyIiwiaWQiOjEsImlhdCI6MTU4OTkyNDY1NH0.lcw5mhFqHDiR0H8XurDZMr2zdnkJZr7Fj1t8HCmDkN8'
+    Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFwcC11c2VyIiwiaWQiOjEsImlhdCI6MTU5MDE2OTgyM30.UjRTrPUKtTLAclNKwzZ_a9MeT7ZrduUp5L7VQrSKrR0'
 }
 
 describe('Suíte de testes para a API de Heróis', function() {
