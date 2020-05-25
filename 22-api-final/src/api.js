@@ -40,6 +40,7 @@ const UsuarioSchema = require('./db/strategies/postgres/schemas/usuarioSchema')
 const Hapi = require('@hapi/hapi')
 const HeroisRoute = require('./routes/heroisRoute')
 const AuthRoute = require('./routes/authRoute')
+const TestCoverageRoute = require('./routes/testCoverageRoute')
 
 const HapiSwagger = require('hapi-swagger');
 const Inert = require('@hapi/inert');
@@ -116,7 +117,8 @@ async function main() {
 
     app.route([
         ...mapRoutes(new AuthRoute(JWT_SECRET, contextPostgres), AuthRoute.methods()),
-        ...mapRoutes(new HeroisRoute(context), HeroisRoute.methods())
+        ...mapRoutes(new HeroisRoute(context), HeroisRoute.methods()),
+        ...mapRoutes(new TestCoverageRoute(), TestCoverageRoute.methods())
     ])
     
     await app.start()
