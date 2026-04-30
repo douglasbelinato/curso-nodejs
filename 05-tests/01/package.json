@@ -9,11 +9,15 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "overrides": {
+    "diff": "^9.0.0",
+    "serialize-javascript": "^7.0.5"
+  },
   "dependencies": {
-    "axios": "^0.19.2",
-    "nock": "^12.0.3"
+    "axios": "^1.15.2",
+    "nock": "^14.0.14"
   },
   "devDependencies": {
-    "mocha": "^7.1.1"
+    "mocha": "^11.7.5"
   }
 }
